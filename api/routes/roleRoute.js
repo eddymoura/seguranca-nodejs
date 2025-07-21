@@ -6,9 +6,9 @@ const RoleController = require("../controllers/roleController");
 
 router
   .post("/role", RoleController.cadastrar)
-  .get("/role")
-  .get("/role/:id")
-  .delete("/role/:id")
-  .put("/role/:id");
+  .get("/role", RoleController.buscarTodos)
+  .get("/role/id/:id", RoleController.buscarPorId)
+  .delete("/role/id/:id", RoleController.deletar)
+  .put("/role/id/:id", RoleController.atualizar);
 
 module.exports = router;
