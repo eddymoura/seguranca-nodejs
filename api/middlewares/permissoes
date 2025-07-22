@@ -1,0 +1,39 @@
+const database = require("../models");
+
+const permissoes = (permissoes) => {
+  return async (req, res, next) => {
+    const { usuarioId } = req;
+
+    try {
+      const usuario = await database.usuarios.findOne({
+        where: { id: usuarioId },
+        include: [
+          {
+            model: database.permissoes,
+            as: "usuario_permissoes",
+            attributes: ["id", "nome"],
+          },
+        ],
+      });
+
+      if (!usuario) {
+        return res.status(404).send({ message: "Usuário não encontrado" });
+      }
+
+      const temPermissaoRequerida = usuario.usuario_permissoes
+        .map((permissao) => permissao.nome)
+        .some((permissao) => permissoes.includes(permissao));
+
+      if (!temPermissaoRequerida) {
+        return res.status(403).send({ message: "Acesso negado" });
+      }
+
+      return next();
+    } catch (error) {
+      console.error("Erro no middleware de permissões:", error);
+      return res.status(500).send({ message: "Erro no servidor" });
+    }
+  };
+};
+
+module.exports = permissoes;
